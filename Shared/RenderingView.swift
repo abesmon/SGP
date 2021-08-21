@@ -41,8 +41,6 @@ private struct _RenderingView<Content: View>: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIHostingController<Content>, context: Context) {
-        print("hello and welkome")
-        print(isRecording)
         guard let vc = uiViewController as? _RenderingViewController<Content> else {
             return
         }
@@ -72,21 +70,26 @@ private class _RenderingViewController<Content: View>: UIHostingController<Conte
     private var counter = 0
 
     func startRendering() {
+        guard displayLink == nil else { return }
         guard renderer.prepare() else { return }
         tick()
-        renderer.startRender {
-            print($0)
-        } onFail: {
-            print($0)
-        }
+
         displayLink = CADisplayLink(target: self, selector: #selector(tick))
         displayLink?.add(to: .main, forMode: .default)
     }
 
     func stopRecording() {
+        guard displayLink != nil else { return }
         displayLink?.invalidate()
         displayLink = nil
-        renderer.endRender()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [renderer] in
+            renderer.startRender {
+                print($0)
+            } onFail: {
+                print($0)
+            }
+            renderer.endRender()
+        }
     }
 
     @objc private func tick() {

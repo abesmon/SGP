@@ -47,7 +47,6 @@ class RealtimeRenderer {
         }
 
         let inputSize = CGSize(width: firstImage.size.width * firstImage.scale, height: firstImage.size.height * firstImage.scale)
-        let inputSizeBitmap = CGSize(width: firstBitmap.width, height: firstBitmap.height)
         let outputSize = outputSize ?? inputSize
 
         let docsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -58,7 +57,7 @@ class RealtimeRenderer {
             let assetWriter = try AVAssetWriter(outputURL: videoOutputURL, fileType: .mov)
 
             let videoSettings: [String : AnyObject] = [
-                AVVideoCodecKey  : AVVideoCodecType.hevc as AnyObject,
+                AVVideoCodecKey  : AVVideoCodecType.h264 as AnyObject,
                 AVVideoWidthKey  : outputSize.width as AnyObject,
                 AVVideoHeightKey : outputSize.height as AnyObject,
                 //                AVVideoCompressionPropertiesKey : [
@@ -68,6 +67,7 @@ class RealtimeRenderer {
                 //                ]
             ]
             let assetWriterInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
+//            assetWriterInput.expectsMediaDataInRealTime = true
 
             let sourceBufferAttributes = [
                 (kCVPixelBufferPixelFormatTypeKey as String): Int(kCVPixelFormatType_32ARGB),
@@ -112,14 +112,12 @@ class RealtimeRenderer {
                           !this.renderEnded || !this.imagePool.isEmpty
                     {
                         guard this.imagePool.first != nil else { return }
-                        autoreleasepool {
-                            let nextFrame = this.imagePool.removeFirst()
-                            let lastFrameTime = CMTimeMake(value: Int64(frameCount), timescale: fps)
-                            let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
+                        let nextFrame = this.imagePool.removeFirst()
+                        let lastFrameTime = CMTimeMake(value: Int64(frameCount), timescale: fps)
+                        let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
 
-                            RenderingTools.appendPixelBuffer(for: nextFrame, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime)
-                            frameCount += 1
-                        }
+                        RenderingTools.appendPixelBuffer(for: nextFrame, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime)
+                        frameCount += 1
                     }
 
                     if this.renderEnded && this.imagePool.isEmpty { complete(self) }
