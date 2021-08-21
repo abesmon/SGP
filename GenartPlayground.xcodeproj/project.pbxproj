@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3783B1FF26D055FA0083D5E5 /* RealtimeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783B1FE26D055FA0083D5E5 /* RealtimeRenderer.swift */; };
+		3783B20026D055FA0083D5E5 /* RealtimeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783B1FE26D055FA0083D5E5 /* RealtimeRenderer.swift */; };
+		3783B20226D056280083D5E5 /* RenderingTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783B20126D056280083D5E5 /* RenderingTools.swift */; };
+		3783B20326D056280083D5E5 /* RenderingTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783B20126D056280083D5E5 /* RenderingTools.swift */; };
 		3783EF6D26BDD02200F73F6D /* RenderingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783EF6C26BDD02200F73F6D /* RenderingView.swift */; };
 		3783EF6E26BDD02200F73F6D /* RenderingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783EF6C26BDD02200F73F6D /* RenderingView.swift */; };
 		3783EF7026BDD0E200F73F6D /* ImagePackRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783EF6F26BDD0E100F73F6D /* ImagePackRenderer.swift */; };
@@ -20,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3783B1FE26D055FA0083D5E5 /* RealtimeRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeRenderer.swift; sourceTree = "<group>"; };
+		3783B20126D056280083D5E5 /* RenderingTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderingTools.swift; sourceTree = "<group>"; };
 		3783EF6C26BDD02200F73F6D /* RenderingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderingView.swift; sourceTree = "<group>"; };
 		3783EF6F26BDD0E100F73F6D /* ImagePackRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePackRenderer.swift; sourceTree = "<group>"; };
 		37AFDA6326BC57BF00911DB6 /* GenartPlaygroundApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenartPlaygroundApp.swift; sourceTree = "<group>"; };
@@ -68,6 +74,8 @@
 				37AFDA6526BC57C200911DB6 /* Assets.xcassets */,
 				3783EF6C26BDD02200F73F6D /* RenderingView.swift */,
 				3783EF6F26BDD0E100F73F6D /* ImagePackRenderer.swift */,
+				3783B20126D056280083D5E5 /* RenderingTools.swift */,
+				3783B1FE26D055FA0083D5E5 /* RealtimeRenderer.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -195,9 +203,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3783B1FF26D055FA0083D5E5 /* RealtimeRenderer.swift in Sources */,
 				3783EF6D26BDD02200F73F6D /* RenderingView.swift in Sources */,
 				37AFDA7826BC57C200911DB6 /* ContentView.swift in Sources */,
 				37AFDA7626BC57C200911DB6 /* GenartPlaygroundApp.swift in Sources */,
+				3783B20226D056280083D5E5 /* RenderingTools.swift in Sources */,
 				3783EF7026BDD0E200F73F6D /* ImagePackRenderer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -206,9 +216,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3783B20026D055FA0083D5E5 /* RealtimeRenderer.swift in Sources */,
 				3783EF6E26BDD02200F73F6D /* RenderingView.swift in Sources */,
 				37AFDA7926BC57C200911DB6 /* ContentView.swift in Sources */,
 				37AFDA7726BC57C200911DB6 /* GenartPlaygroundApp.swift in Sources */,
+				3783B20326D056280083D5E5 /* RenderingTools.swift in Sources */,
 				3783EF7126BDD0E200F73F6D /* ImagePackRenderer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

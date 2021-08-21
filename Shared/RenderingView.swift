@@ -67,13 +67,18 @@ private struct _RenderingView<Content: View>: UIViewControllerRepresentable {
 }
 
 private class _RenderingViewController<Content: View>: UIHostingController<Content> {
-    private var images: [UIImage] = []
-
-    var displayLink: CADisplayLink?
+    private let renderer = RealtimeRenderer()
+    private var displayLink: CADisplayLink?
+    private var counter = 0
 
     func startRendering() {
-        images = []
-
+        guard renderer.prepare() else { return }
+        tick()
+        renderer.startRender {
+            print($0)
+        } onFail: {
+            print($0)
+        }
         displayLink = CADisplayLink(target: self, selector: #selector(tick))
         displayLink?.add(to: .main, forMode: .default)
     }
@@ -81,7 +86,7 @@ private class _RenderingViewController<Content: View>: UIHostingController<Conte
     func stopRecording() {
         displayLink?.invalidate()
         displayLink = nil
-        writeToVideo()
+        renderer.endRender()
     }
 
     @objc private func tick() {
@@ -90,15 +95,6 @@ private class _RenderingViewController<Content: View>: UIHostingController<Conte
         let image = renderer.image { (ctx) in
             view.layer.presentation()?.render(in: ctx.cgContext)
         }
-        images.append(image)
-    }
-
-    private func writeToVideo() {
-        ImagePackRenderer().render(images: images) {
-            print($0)
-        } onFail: {
-            print($0)
-        }
-        images = []
+        self.renderer.enqueue(image: image)
     }
 }

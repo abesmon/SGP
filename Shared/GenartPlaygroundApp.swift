@@ -24,8 +24,8 @@ struct GenartPlaygroundApp: App {
             .background(
                 RenderingView(
                     isRecording: $isRecording,
-                    width: 256,
-                    height: 256
+                    width: 1024,
+                    height: 1024
                 ) {
                     ContentView()
                 }
@@ -37,7 +37,7 @@ struct GenartPlaygroundApp: App {
     func record() {
         isRecording = .startRendering
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             isRecording = .stopRendering
         }
     }

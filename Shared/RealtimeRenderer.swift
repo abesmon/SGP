@@ -1,24 +1,47 @@
 //
-//  ImagePackRenderer.swift
+//  RealtimeRenderer.swift
 //  GenartPlayground
 //
-//  Created by Алексей Лысенко on 06.08.2021.
+//  Created by Алексей Лысенко on 21.08.2021.
 //
 
 import UIKit
 import AVFoundation
 
-enum RenderingErrors: Error {
-    case noImagesToRender
-    case unknownErrorWhileOnWritingStart
-    case renderAlreadyInProgress
-}
+class RealtimeRenderer {
+    private var imagePool: [UIImage] = [] {
+        didSet {
+            print(imagePool.count)
+        }
+    }
+    private var renderEnded = true
+    private var queueCount = 0
 
-class ImagePackRenderer {
+    func prepare() -> Bool {
+        guard renderEnded else { return false }
+        queueCount = 0
+        return true
+    }
 
-    func render(images: [UIImage], outputSize: CGSize? = nil, onComplete: ((URL) -> Void)?, onFail: ((Error) -> Void)?) {
-        guard let firstImage = images.first,
+    func enqueue(image: UIImage) {
+        queueCount += 1
+        imagePool.append(image)
+    }
+
+    func endRender() {
+        renderEnded = true
+    }
+
+    func startRender(outputSize: CGSize? = nil, onComplete: ((URL) -> Void)?, onFail: ((Error) -> Void)?) {
+        guard renderEnded else {
+            onFail?(RenderingErrors.renderAlreadyInProgress)
+            return
+        }
+
+        renderEnded = false
+        guard let firstImage = imagePool.first,
               let firstBitmap = firstImage.cgImage else {
+            endRender()
             onFail?(RenderingErrors.noImagesToRender)
             return
         }
@@ -66,34 +89,47 @@ class ImagePackRenderer {
                 let media_queue = DispatchQueue(label: "mediaInputQueue")
 
                 var frameCount = 0
-                var remainingImages = [UIImage](images.reversed())
 
-                assetWriterInput.requestMediaDataWhenReady(on: media_queue) {
-                    let fps = Int32(UIScreen.main.maximumFramesPerSecond)
-                    let frameDuration = CMTimeMake(value: 1, timescale: fps)
-
-                    print("frames to render: \(remainingImages.count)")
-
-                    while assetWriterInput.isReadyForMoreMediaData,
-                          let nextFrame = remainingImages.popLast() {
-                        let lastFrameTime = CMTimeMake(value: Int64(frameCount), timescale: fps)
-                        let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
-
-                        RenderingTools.appendPixelBuffer(for: nextFrame, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime)
-                        frameCount += 1
-                    }
-
-                    if remainingImages.isEmpty {
-                        assetWriterInput.markAsFinished()
-                        assetWriter.finishWriting {
-                            onComplete?(videoOutputURL)
-                        }
+                func complete(_ this: RealtimeRenderer?) {
+                    this?.renderEnded = true
+                    assetWriterInput.markAsFinished()
+                    assetWriter.finishWriting {
+                        onComplete?(videoOutputURL)
+                        print("ended with frameCount: \(frameCount) and queueCount: \(this?.queueCount ?? -1)")
                     }
                 }
+
+                let fps = Int32(UIScreen.main.maximumFramesPerSecond)
+                let frameDuration = CMTimeMake(value: 1, timescale: fps)
+                
+                assetWriterInput.requestMediaDataWhenReady(on: media_queue) { [weak self] in
+                    guard let this = self else {
+                        complete(self)
+                        return
+                    }
+
+                    while assetWriterInput.isReadyForMoreMediaData,
+                          !this.renderEnded || !this.imagePool.isEmpty
+                    {
+                        guard this.imagePool.first != nil else { return }
+                        autoreleasepool {
+                            let nextFrame = this.imagePool.removeFirst()
+                            let lastFrameTime = CMTimeMake(value: Int64(frameCount), timescale: fps)
+                            let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
+
+                            RenderingTools.appendPixelBuffer(for: nextFrame, pixelBufferAdaptor: pixelBufferAdaptor, presentationTime: presentationTime)
+                            frameCount += 1
+                        }
+                    }
+
+                    if this.renderEnded && this.imagePool.isEmpty { complete(self) }
+                }
             } else {
+                endRender()
                 onFail?(assetWriter.error ?? RenderingErrors.unknownErrorWhileOnWritingStart)
             }
         } catch {
+            endRender()
             onFail?(error)
         }
     }
